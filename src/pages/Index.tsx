@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DrinkForm, { Drink } from "@/components/DrinkForm";
 import DailySummary from "@/components/DailySummary";
+import AlcoholGraph from "@/components/AlcoholGraph";
 
 const Index = () => {
   const [drinks, setDrinks] = useState<Drink[]>([]);
@@ -18,6 +19,7 @@ const Index = () => {
       
       <DrinkForm onAddDrink={handleAddDrink} />
       <DailySummary drinks={drinks} />
+      <AlcoholGraph drinks={drinks} />
     </div>
   );
 };
