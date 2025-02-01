@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { ChartContainer } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import type { Drink } from "./DrinkForm";
 
 interface AlcoholGraphProps {
@@ -55,9 +55,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
                 style: { fontSize: '12px' }
               }}
             />
-            <ChartTooltip>
-              <ChartTooltipContent />
-            </ChartTooltip>
+            <Tooltip />
             <Line
               type="monotone"
               dataKey="total"
