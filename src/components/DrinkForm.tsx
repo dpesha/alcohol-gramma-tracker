@@ -20,8 +20,8 @@ interface DrinkFormProps {
 }
 
 const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
-  const [percentage, setPercentage] = useState("");
-  const [volume, setVolume] = useState("");
+  const [percentage, setPercentage] = useState("5");
+  const [volume, setVolume] = useState("350");
   const [type, setType] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,8 +59,8 @@ const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
     toast.success("Drink added successfully");
     
     // Reset form
-    setPercentage("");
-    setVolume("");
+    setPercentage("5");
+    setVolume("350");
     setType("");
   };
 
@@ -75,6 +75,7 @@ const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="beer">Beer</SelectItem>
+              <SelectItem value="highball">Highball</SelectItem>
               <SelectItem value="wine">Wine</SelectItem>
               <SelectItem value="spirits">Spirits</SelectItem>
               <SelectItem value="cocktail">Cocktail</SelectItem>
@@ -105,7 +106,7 @@ const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
             min="0"
             value={volume}
             onChange={(e) => setVolume(e.target.value)}
-            placeholder="e.g. 330"
+            placeholder="e.g. 350"
           />
         </div>
 
