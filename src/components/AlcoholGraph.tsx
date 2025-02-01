@@ -10,7 +10,7 @@ interface AlcoholGraphProps {
 const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
   // Group drinks by date and calculate total alcohol for each day
   const dailyData = drinks.reduce((acc: { date: string; total: number }[], drink) => {
-    const date = new Date().toLocaleDateString();
+    const date = new Date(drink.date).toLocaleDateString();
     const existingDay = acc.find(d => d.date === date);
     
     if (existingDay) {
@@ -21,6 +21,9 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
     
     return acc;
   }, []);
+
+  // Sort data by date
+  dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   console.log("Graph data:", dailyData);
 
