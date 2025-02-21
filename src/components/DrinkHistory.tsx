@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,8 +20,8 @@ interface DrinkHistoryProps {
 const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingDrink, setEditingDrink] = useState<{ drink: Drink; index: number } | null>(null);
+  const [isAddingDrink, setIsAddingDrink] = useState(false);
 
   const dailyTotals = drinks.reduce((acc: Record<string, number>, drink) => {
     const dateStr = new Date(drink.date).toISOString().split('T')[0];
@@ -81,23 +82,14 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
 
   const handleAddNewDrink = (drink: Drink) => {
     onAddDrink(drink);
-    setIsAddDialogOpen(false);
+    setIsAddingDrink(false);
+    setIsDialogOpen(true); // Keep the dialog open to show the updated list
   };
 
   return (
     <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Drink History</h2>
-        <Button 
-          onClick={() => {
-            setSelectedDate(new Date());
-            setIsAddDialogOpen(true);
-          }}
-          size="sm"
-        >
-          <Plus className="mr-1" />
-          Add Drink
-        </Button>
       </div>
 
       <Calendar
@@ -119,54 +111,87 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
               Drinks for {selectedDate ? format(selectedDate, 'PPP') : ''}
             </DialogTitle>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Volume (ml)</TableHead>
-                  <TableHead>Alcohol (%)</TableHead>
-                  <TableHead>Total (g)</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedDrinks.map((drink, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{drink.type}</TableCell>
-                    <TableCell>{drink.volume}</TableCell>
-                    <TableCell>{drink.alcoholPercentage}%</TableCell>
-                    <TableCell>{drink.alcoholGrams.toFixed(1)}g</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(drink, drinks.indexOf(drink))}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => onDeleteDrink(drinks.indexOf(drink))}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+          {selectedDrinks.length > 0 ? (
+            <div className="max-h-[60vh] overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Volume (ml)</TableHead>
+                    <TableHead>Alcohol (%)</TableHead>
+                    <TableHead>Total (g)</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {selectedDrinks.map((drink, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{drink.type}</TableCell>
+                      <TableCell>{drink.volume}</TableCell>
+                      <TableCell>{drink.alcoholPercentage}%</TableCell>
+                      <TableCell>{drink.alcoholGrams.toFixed(1)}g</TableCell>
+                      <TableCell className="space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(drink, drinks.indexOf(drink))}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => onDeleteDrink(drinks.indexOf(drink))}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={() => setIsAddingDrink(true)}
+                  size="sm"
+                >
+                  <Plus className="mr-1" />
+                  Add Another Drink
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground mb-4">No drinks recorded for this date</p>
+              <Button 
+                onClick={() => setIsAddingDrink(true)}
+                size="sm"
+              >
+                <Plus className="mr-1" />
+                Add First Drink
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      <Dialog open={isAddingDrink} onOpenChange={setIsAddingDrink}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Drink</DialogTitle>
           </DialogHeader>
-          <DrinkForm onAddDrink={handleAddNewDrink} />
+          {selectedDate && (
+            <DrinkForm 
+              onAddDrink={handleAddNewDrink}
+              initialDrink={{ 
+                type: "Beer",
+                volume: 350,
+                alcoholPercentage: 5,
+                alcoholGrams: 0,
+                date: selectedDate 
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
