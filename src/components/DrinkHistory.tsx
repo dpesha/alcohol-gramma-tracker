@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -6,25 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { format } from "date-fns";
+import { Plus, Edit, Trash } from "lucide-react";
 import type { Drink } from "./DrinkForm";
+import DrinkForm from "./DrinkForm";
 
 interface DrinkHistoryProps {
   drinks: Drink[];
   onDeleteDrink: (drinkIndex: number) => void;
+  onAddDrink: (drink: Drink) => void;
+  onEditDrink: (drinkIndex: number, updatedDrink: Drink) => void;
 }
 
-const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
+const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingDrink, setEditingDrink] = useState<{ drink: Drink; index: number } | null>(null);
 
-  // Create a map of dates to total alcohol grams
   const dailyTotals = drinks.reduce((acc: Record<string, number>, drink) => {
     const dateStr = new Date(drink.date).toISOString().split('T')[0];
     acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
     return acc;
   }, {});
 
-  // Get drinks for selected date
   const selectedDrinks = selectedDate
     ? drinks.filter(
         drink =>
@@ -48,7 +51,6 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
     },
   };
 
-  // Custom day content renderer to show totals
   const formatters = {
     formatDay: (date: Date) => {
       const dateStr = date.toISOString().split('T')[0];
@@ -66,9 +68,38 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
     },
   };
 
+  const handleEdit = (drink: Drink, index: number) => {
+    setEditingDrink({ drink, index });
+  };
+
+  const handleEditSubmit = (updatedDrink: Drink) => {
+    if (editingDrink) {
+      onEditDrink(editingDrink.index, updatedDrink);
+      setEditingDrink(null);
+    }
+  };
+
+  const handleAddNewDrink = (drink: Drink) => {
+    onAddDrink(drink);
+    setIsAddDialogOpen(false);
+  };
+
   return (
     <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
-      <h2 className="text-xl font-semibold mb-4">Drink History</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Drink History</h2>
+        <Button 
+          onClick={() => {
+            setSelectedDate(new Date());
+            setIsAddDialogOpen(true);
+          }}
+          size="sm"
+        >
+          <Plus className="mr-1" />
+          Add Drink
+        </Button>
+      </div>
+
       <Calendar
         mode="single"
         selected={selectedDate}
@@ -96,7 +127,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
                   <TableHead>Volume (ml)</TableHead>
                   <TableHead>Alcohol (%)</TableHead>
                   <TableHead>Total (g)</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -106,16 +137,20 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
                     <TableCell>{drink.volume}</TableCell>
                     <TableCell>{drink.alcoholPercentage}%</TableCell>
                     <TableCell>{drink.alcoholGrams.toFixed(1)}g</TableCell>
-                    <TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(drink, drinks.indexOf(drink))}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          const drinkIndex = drinks.indexOf(drink);
-                          onDeleteDrink(drinkIndex);
-                        }}
+                        onClick={() => onDeleteDrink(drinks.indexOf(drink))}
                       >
-                        Delete
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -123,6 +158,29 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
               </TableBody>
             </Table>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Drink</DialogTitle>
+          </DialogHeader>
+          <DrinkForm onAddDrink={handleAddNewDrink} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editingDrink} onOpenChange={(open) => !open && setEditingDrink(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Drink</DialogTitle>
+          </DialogHeader>
+          {editingDrink && (
+            <DrinkForm 
+              onAddDrink={handleEditSubmit}
+              initialDrink={editingDrink.drink}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Card>

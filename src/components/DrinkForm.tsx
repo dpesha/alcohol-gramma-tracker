@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,23 @@ export interface Drink {
 
 interface DrinkFormProps {
   onAddDrink: (drink: Drink) => void;
+  initialDrink?: Drink;
 }
 
-const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
-  const [type, setType] = useState("Beer");
-  const [volume, setVolume] = useState("350");
-  const [alcoholPercentage, setAlcoholPercentage] = useState("5");
-  const [date, setDate] = useState<Date>(new Date());
+const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
+  const [type, setType] = useState(initialDrink?.type || "Beer");
+  const [volume, setVolume] = useState(initialDrink?.volume.toString() || "350");
+  const [alcoholPercentage, setAlcoholPercentage] = useState(initialDrink?.alcoholPercentage.toString() || "5");
+  const [date, setDate] = useState<Date>(initialDrink?.date || new Date());
+
+  useEffect(() => {
+    if (initialDrink) {
+      setType(initialDrink.type);
+      setVolume(initialDrink.volume.toString());
+      setAlcoholPercentage(initialDrink.alcoholPercentage.toString());
+      setDate(new Date(initialDrink.date));
+    }
+  }, [initialDrink]);
 
   const calculateAlcoholGrams = (volume: number, percentage: number) => {
     // Alcohol density is approximately 0.789 g/ml
@@ -42,86 +53,87 @@ const DrinkForm = ({ onAddDrink }: DrinkFormProps) => {
       volume: Number(volume),
       alcoholPercentage: Number(alcoholPercentage),
       alcoholGrams,
-      date: date
+      date
     });
 
-    // Reset form (except date)
-    setType("Beer");
-    setVolume("350");
-    setAlcoholPercentage("5");
+    if (!initialDrink) {
+      // Only reset if we're not editing
+      setType("Beer");
+      setVolume("350");
+      setAlcoholPercentage("5");
+    }
   };
 
   return (
-    <Card className="glass-card p-6 w-full max-w-md mx-auto fade-in">
-      <h2 className="text-xl font-semibold mb-4">Add Drink</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Type</label>
-          <Select value={type} onValueChange={setType}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Beer">Beer</SelectItem>
-              <SelectItem value="Highball">Highball</SelectItem>
-              <SelectItem value="Wine">Wine</SelectItem>
-              <SelectItem value="Spirits">Spirits</SelectItem>
-              <SelectItem value="Cocktail">Cocktail</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Type</label>
+        <Select value={type} onValueChange={setType}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Beer">Beer</SelectItem>
+            <SelectItem value="Highball">Highball</SelectItem>
+            <SelectItem value="Wine">Wine</SelectItem>
+            <SelectItem value="Spirits">Spirits</SelectItem>
+            <SelectItem value="Cocktail">Cocktail</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Volume (ml)</label>
-          <Input
-            type="number"
-            value={volume}
-            onChange={(e) => setVolume(e.target.value)}
-            min="0"
-          />
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Volume (ml)</label>
+        <Input
+          type="number"
+          value={volume}
+          onChange={(e) => setVolume(e.target.value)}
+          min="0"
+        />
+      </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Alcohol Percentage (%)</label>
-          <Input
-            type="number"
-            value={alcoholPercentage}
-            onChange={(e) => setAlcoholPercentage(e.target.value)}
-            min="0"
-            max="100"
-            step="0.1"
-          />
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Alcohol Percentage (%)</label>
+        <Input
+          type="number"
+          value={alcoholPercentage}
+          onChange={(e) => setAlcoholPercentage(e.target.value)}
+          min="0"
+          max="100"
+          step="0.1"
+        />
+      </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Date</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={(newDate) => setDate(newDate || new Date())}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Date</label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(newDate) => setDate(newDate || new Date())}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
 
-        <Button type="submit" className="w-full">Add Drink</Button>
-      </form>
-    </Card>
+      <Button type="submit" className="w-full">
+        {initialDrink ? 'Save Changes' : 'Add Drink'}
+      </Button>
+    </form>
   );
 };
 
