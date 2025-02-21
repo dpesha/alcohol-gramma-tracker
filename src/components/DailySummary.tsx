@@ -1,6 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import type { Drink } from "./DrinkForm";
 import { startOfDay, startOfWeek, startOfMonth, endOfDay, endOfWeek, endOfMonth, isWithinInterval } from "date-fns";
 
@@ -12,6 +13,10 @@ interface PeriodSummary {
   totalDrinks: number;
   totalAlcohol: number;
 }
+
+const DAILY_LIMIT = 40;
+const WEEKLY_LIMIT = DAILY_LIMIT * 7;
+const MONTHLY_LIMIT = DAILY_LIMIT * 30;
 
 const DailySummary = ({ drinks }: DailySummaryProps) => {
   const calculateSummary = (start: Date, end: Date): PeriodSummary => {
@@ -42,6 +47,16 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
     endOfMonth(now)
   );
 
+  const getProgressValue = (current: number, limit: number) => {
+    return Math.min((current / limit) * 100, 100);
+  };
+
+  const getProgressColor = (percentage: number) => {
+    if (percentage >= 100) return "bg-destructive";
+    if (percentage >= 75) return "bg-yellow-500";
+    return "bg-primary";
+  };
+
   return (
     <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
       <Tabs defaultValue="daily" className="w-full">
@@ -60,6 +75,16 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
             <span className="text-muted-foreground">Total Alcohol</span>
             <span className="font-medium">{dailySummary.totalAlcohol.toFixed(1)}g</span>
           </div>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Daily Limit ({DAILY_LIMIT}g)</span>
+              <span className="font-medium">{((dailySummary.totalAlcohol / DAILY_LIMIT) * 100).toFixed(1)}%</span>
+            </div>
+            <Progress 
+              value={getProgressValue(dailySummary.totalAlcohol, DAILY_LIMIT)} 
+              className={getProgressColor(dailySummary.totalAlcohol / DAILY_LIMIT * 100)}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="weekly" className="space-y-4 mt-4">
@@ -77,6 +102,16 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
               {(weeklySummary.totalAlcohol / 7).toFixed(1)}g
             </span>
           </div>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Weekly Limit ({WEEKLY_LIMIT}g)</span>
+              <span className="font-medium">{((weeklySummary.totalAlcohol / WEEKLY_LIMIT) * 100).toFixed(1)}%</span>
+            </div>
+            <Progress 
+              value={getProgressValue(weeklySummary.totalAlcohol, WEEKLY_LIMIT)} 
+              className={getProgressColor(weeklySummary.totalAlcohol / WEEKLY_LIMIT * 100)}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="monthly" className="space-y-4 mt-4">
@@ -93,6 +128,16 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
             <span className="font-medium">
               {(monthlySummary.totalAlcohol / 30).toFixed(1)}g
             </span>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Monthly Limit ({MONTHLY_LIMIT}g)</span>
+              <span className="font-medium">{((monthlySummary.totalAlcohol / MONTHLY_LIMIT) * 100).toFixed(1)}%</span>
+            </div>
+            <Progress 
+              value={getProgressValue(monthlySummary.totalAlcohol, MONTHLY_LIMIT)} 
+              className={getProgressColor(monthlySummary.totalAlcohol / MONTHLY_LIMIT * 100)}
+            />
           </div>
         </TabsContent>
       </Tabs>
