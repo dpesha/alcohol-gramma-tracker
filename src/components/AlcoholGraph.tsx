@@ -46,10 +46,10 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
   };
 
   return (
-    <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Alcohol Intake Over Time</h2>
-        <div className="flex items-center gap-2">
+    <Card className="glass-card p-4 w-full max-w-md mx-auto mt-6 fade-in">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">Alcohol Intake Over Time</h2>
+        <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="sm"
@@ -57,7 +57,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="min-w-[120px] text-center">
+          <span className="min-w-[100px] text-center text-sm">
             {format(currentMonth, 'MMMM yyyy')}
           </span>
           <Button
@@ -69,7 +69,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           </Button>
         </div>
       </div>
-      <div className="h-[300px] w-full">
+      <div className="h-[250px] w-full">
         {dailyData.length > 0 ? (
           <ChartContainer
             className="h-full"
@@ -82,21 +82,26 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
               },
             }}
           >
-            <LineChart data={dailyData}>
+            <LineChart 
+              data={dailyData}
+              margin={{ top: 10, right: 10, left: 40, bottom: 20 }}
+            >
               <XAxis
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
+                fontSize={11}
                 tickFormatter={(date) => format(new Date(date), 'd')}
+                dy={10}
               />
               <YAxis
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
+                fontSize={11}
                 label={{ 
                   value: 'Alcohol (g)', 
                   angle: -90, 
                   position: 'insideLeft',
-                  style: { fontSize: '12px' }
+                  style: { fontSize: '11px' },
+                  dx: -20
                 }}
               />
               <Tooltip 
