@@ -27,7 +27,7 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
   const [type, setType] = useState(initialDrink?.type || "Beer");
   const [volume, setVolume] = useState(initialDrink?.volume.toString() || "350");
   const [alcoholPercentage, setAlcoholPercentage] = useState(initialDrink?.alcoholPercentage.toString() || "5");
-  const [date, setDate] = useState<Date>(initialDrink?.date || new Date());
+  const [date, setDate] = useState<Date | undefined>(initialDrink?.date || new Date());
 
   useEffect(() => {
     if (initialDrink) {
@@ -46,6 +46,8 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!date) return;
+
     const alcoholGrams = calculateAlcoholGrams(Number(volume), Number(alcoholPercentage));
     
     onAddDrink({
@@ -61,6 +63,7 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
       setType("Beer");
       setVolume("350");
       setAlcoholPercentage("5");
+      setDate(new Date());
     }
   };
 
@@ -123,7 +126,7 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
             <Calendar
               mode="single"
               selected={date}
-              onSelect={(newDate) => setDate(newDate || new Date())}
+              onSelect={setDate}
               initialFocus
             />
           </PopoverContent>
