@@ -84,7 +84,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <LineChart 
               data={dailyData}
-              margin={{ top: 10, right: 10, left: 40, bottom: 20 }}
+              margin={{ top: 10, right: 30, left: 10, bottom: 20 }}
             >
               <XAxis
                 dataKey="date"
@@ -101,7 +101,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
                   angle: -90, 
                   position: 'insideLeft',
                   style: { fontSize: '11px' },
-                  dx: -20
+                  dx: -10
                 }}
               />
               <Tooltip 
