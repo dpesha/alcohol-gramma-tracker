@@ -48,6 +48,24 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
     },
   };
 
+  // Custom day content renderer to show totals
+  const formatters = {
+    formatDay: (date: Date) => {
+      const dateStr = date.toISOString().split('T')[0];
+      const total = dailyTotals[dateStr];
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div>{date.getDate()}</div>
+          {total && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              {total.toFixed(1)}g
+            </div>
+          )}
+        </div>
+      );
+    },
+  };
+
   return (
     <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
       <h2 className="text-xl font-semibold mb-4">Drink History</h2>
@@ -60,13 +78,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink }: DrinkHistoryProps) => {
         }}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
-        footer={
-          selectedDate && (
-            <div className="text-sm text-center">
-              Total: {dailyTotals[selectedDate.toISOString().split('T')[0]]?.toFixed(1) || 0}g
-            </div>
-          )
-        }
+        formatters={formatters}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
