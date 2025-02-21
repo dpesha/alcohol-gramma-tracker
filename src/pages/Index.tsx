@@ -1,13 +1,19 @@
+
 import { useState } from "react";
 import DrinkForm, { Drink } from "@/components/DrinkForm";
 import DailySummary from "@/components/DailySummary";
 import AlcoholGraph from "@/components/AlcoholGraph";
+import DrinkHistory from "@/components/DrinkHistory";
 
 const Index = () => {
   const [drinks, setDrinks] = useState<Drink[]>([]);
 
   const handleAddDrink = (drink: Drink) => {
     setDrinks((prev) => [...prev, drink]);
+  };
+
+  const handleDeleteDrink = (index: number) => {
+    setDrinks((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -19,6 +25,7 @@ const Index = () => {
       
       <DrinkForm onAddDrink={handleAddDrink} />
       <DailySummary drinks={drinks} />
+      <DrinkHistory drinks={drinks} onDeleteDrink={handleDeleteDrink} />
       <AlcoholGraph drinks={drinks} />
     </div>
   );
