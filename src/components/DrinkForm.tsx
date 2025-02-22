@@ -122,8 +122,8 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
+    <div className="space-y-2">
+      <div className="flex gap-2 mb-2">
         <Button
           type="button"
           variant={isCustom ? "default" : "outline"}
@@ -213,49 +213,53 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
           </Button>
         </form>
       ) : (
-        <form onSubmit={handlePresetSubmit} className="space-y-4">
-          <div className="space-y-4">
+        <form onSubmit={handlePresetSubmit} className="space-y-2">
+          <div className="grid gap-2">
             {DRINK_PRESETS.map((preset) => (
-              <div key={preset.name} className="p-4 border rounded-lg space-y-2">
+              <div key={preset.name} className="p-2 border rounded-lg">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">{preset.name}</span>
-                  <div className="flex items-center gap-4">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">{preset.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {preset.alcoholPercentage}% · {preset.volume}ml
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="sm"
+                      className="h-7 w-7"
                       onClick={() => updatePresetCount(preset.name, false)}
                     >
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-3 w-3" />
                     </Button>
-                    <span className="text-lg font-medium w-6 text-center">
+                    <span className="text-sm font-medium w-4 text-center">
                       {presetCounts[preset.name]}
                     </span>
                     <Button
                       type="button"
                       variant="outline"
-                      size="icon"
+                      size="sm"
+                      className="h-7 w-7"
                       onClick={() => updatePresetCount(preset.name, true)}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-3 w-3" />
                     </Button>
                   </div>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {preset.alcoholPercentage}% alcohol · {preset.volume}ml
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 mt-2">
             <label className="text-sm font-medium">Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal text-sm",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -276,7 +280,7 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
 
           <Button 
             type="submit" 
-            className="w-full"
+            className="w-full mt-2"
             disabled={Object.values(presetCounts).every(count => count === 0)}
           >
             Add Drinks
