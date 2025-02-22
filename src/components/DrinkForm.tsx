@@ -40,13 +40,14 @@ const DRINK_PRESETS: PresetDrink[] = [
 ];
 
 const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
-  const [isCustom, setIsCustom] = useState(true);
+  const [isCustom, setIsCustom] = useState(false); // Changed to false to make presets default
   const [type, setType] = useState(initialDrink?.type || "Beer");
   const [volume, setVolume] = useState(initialDrink?.volume.toString() || "350");
   const [alcoholPercentage, setAlcoholPercentage] = useState(initialDrink?.alcoholPercentage.toString() || "5");
   const [date, setDate] = useState<Date | undefined>(initialDrink?.date || new Date());
-  const [selectedPreset, setSelectedPreset] = useState<string>("");
-  const [presetCount, setPresetCount] = useState(1);
+  const [presetCounts, setPresetCounts] = useState<{ [key: string]: number }>(
+    Object.fromEntries(DRINK_PRESETS.map(preset => [preset.name, 0])) // Initialize all counters to 0
+  );
 
   useEffect(() => {
     if (initialDrink) {
@@ -59,44 +60,37 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
   }, [initialDrink]);
 
   const calculateAlcoholGrams = (volume: number, percentage: number) => {
-    // Alcohol density is approximately 0.789 g/ml
     return (volume * (percentage / 100) * 0.789);
-  };
-
-  const handlePresetSelect = (presetName: string) => {
-    setSelectedPreset(presetName);
-    setIsCustom(false);
-    setPresetCount(1);
-
-    const preset = DRINK_PRESETS.find(p => p.name === presetName);
-    if (preset) {
-      setType(preset.type);
-      setVolume(preset.volume.toString());
-      setAlcoholPercentage(preset.alcoholPercentage.toString());
-    }
   };
 
   const handlePresetSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date) return;
 
-    const alcoholGrams = calculateAlcoholGrams(Number(volume), Number(alcoholPercentage));
-    
-    // Add multiple drinks based on count
-    for (let i = 0; i < presetCount; i++) {
-      onAddDrink({
-        type,
-        volume: Number(volume),
-        alcoholPercentage: Number(alcoholPercentage),
-        alcoholGrams,
-        date
-      });
-    }
+    // Add drinks for each preset with count > 0
+    Object.entries(presetCounts).forEach(([presetName, count]) => {
+      if (count > 0) {
+        const preset = DRINK_PRESETS.find(p => p.name === presetName);
+        if (preset) {
+          const alcoholGrams = calculateAlcoholGrams(preset.volume, preset.alcoholPercentage);
+          
+          for (let i = 0; i < count; i++) {
+            onAddDrink({
+              type: preset.type,
+              volume: preset.volume,
+              alcoholPercentage: preset.alcoholPercentage,
+              alcoholGrams,
+              date
+            });
+          }
+        }
+      }
+    });
 
-    // Reset form
-    if (!initialDrink) {
-      setPresetCount(1);
-    }
+    // Reset all counters to 0
+    setPresetCounts(
+      Object.fromEntries(DRINK_PRESETS.map(preset => [preset.name, 0]))
+    );
   };
 
   const handleCustomSubmit = (e: React.FormEvent) => {
@@ -118,6 +112,13 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
       setVolume("350");
       setAlcoholPercentage("5");
     }
+  };
+
+  const updatePresetCount = (presetName: string, increment: boolean) => {
+    setPresetCounts(prev => ({
+      ...prev,
+      [presetName]: increment ? prev[presetName] + 1 : Math.max(0, prev[presetName] - 1)
+    }));
   };
 
   return (
@@ -213,78 +214,73 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
         </form>
       ) : (
         <form onSubmit={handlePresetSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Preset Drinks</label>
-            <Select value={selectedPreset} onValueChange={handlePresetSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a preset drink" />
-              </SelectTrigger>
-              <SelectContent>
-                {DRINK_PRESETS.map((preset) => (
-                  <SelectItem key={preset.name} value={preset.name}>
-                    {preset.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedPreset && (
-            <>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Count</label>
-                <div className="flex items-center justify-between gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setPresetCount(Math.max(1, presetCount - 1))}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="text-lg font-medium">{presetCount}</span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setPresetCount(presetCount + 1)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+          <div className="space-y-4">
+            {DRINK_PRESETS.map((preset) => (
+              <div key={preset.name} className="p-4 border rounded-lg space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{preset.name}</span>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => updatePresetCount(preset.name, false)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-lg font-medium w-6 text-center">
+                      {presetCounts[preset.name]}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => updatePresetCount(preset.name, true)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {preset.alcoholPercentage}% alcohol · {preset.volume}ml
                 </div>
               </div>
+            ))}
+          </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Date</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-              <Button type="submit" className="w-full">
-                Add {presetCount} {selectedPreset}
-              </Button>
-            </>
-          )}
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={Object.values(presetCounts).every(count => count === 0)}
+          >
+            Add Drinks
+          </Button>
         </form>
       )}
     </div>
