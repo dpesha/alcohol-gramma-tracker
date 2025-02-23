@@ -4,10 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon, Plus, Minus } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface Drink {
@@ -21,6 +19,7 @@ export interface Drink {
 interface DrinkFormProps {
   onAddDrink: (drink: Drink) => void;
   initialDrink?: Drink;
+  date: Date; // Now required as a prop since we're not selecting it in the form
 }
 
 interface PresetDrink {
@@ -39,12 +38,11 @@ const DRINK_PRESETS: PresetDrink[] = [
   { name: "Highball (500ml)", type: "Highball", volume: 500, alcoholPercentage: 7 },
 ];
 
-const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
+const DrinkForm = ({ onAddDrink, initialDrink, date }: DrinkFormProps) => {
   const [isCustom, setIsCustom] = useState(false); // Changed to false to make presets default
   const [type, setType] = useState(initialDrink?.type || "Beer");
   const [volume, setVolume] = useState(initialDrink?.volume.toString() || "350");
   const [alcoholPercentage, setAlcoholPercentage] = useState(initialDrink?.alcoholPercentage.toString() || "5");
-  const [date, setDate] = useState<Date | undefined>(initialDrink?.date || new Date());
   const [presetCounts, setPresetCounts] = useState<{ [key: string]: number }>(
     Object.fromEntries(DRINK_PRESETS.map(preset => [preset.name, 0])) // Initialize all counters to 0
   );
@@ -54,7 +52,6 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
       setType(initialDrink.type);
       setVolume(initialDrink.volume.toString());
       setAlcoholPercentage(initialDrink.alcoholPercentage.toString());
-      setDate(new Date(initialDrink.date));
       setIsCustom(true);
     }
   }, [initialDrink]);
@@ -65,7 +62,6 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
 
   const handlePresetSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) return;
 
     // Add drinks for each preset with count > 0
     Object.entries(presetCounts).forEach(([presetName, count]) => {
@@ -95,7 +91,6 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date) return;
 
     const alcoholGrams = calculateAlcoholGrams(Number(volume), Number(alcoholPercentage));
     
@@ -182,32 +177,6 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
           <Button type="submit" className="w-full">
             {initialDrink ? 'Save Changes' : 'Add Drink'}
           </Button>
@@ -250,32 +219,6 @@ const DrinkForm = ({ onAddDrink, initialDrink }: DrinkFormProps) => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="space-y-2 mt-2">
-            <label className="text-sm font-medium">Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal text-sm",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
           </div>
 
           <Button 
