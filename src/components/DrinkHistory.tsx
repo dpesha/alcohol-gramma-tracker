@@ -71,6 +71,13 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
     onAddDrink(drink);
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      setIsDialogOpen(true);
+    }
+  };
+
   return (
     <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
       <div className="flex justify-between items-center mb-4">
@@ -80,12 +87,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
       <Calendar
         mode="single"
         selected={selectedDate}
-        onSelect={(date) => {
-          if (date) {
-            setSelectedDate(date);
-            setIsDialogOpen(true);
-          }
-        }}
+        onSelect={handleDateSelect}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
         formatters={formatters}
