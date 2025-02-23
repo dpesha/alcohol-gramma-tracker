@@ -30,10 +30,10 @@ interface PresetDrink {
 }
 
 const DRINK_PRESETS: PresetDrink[] = [
-  { name: "Normal Beer (350ml)", type: "Beer", volume: 350, alcoholPercentage: 5 },
-  { name: "Normal Beer (500ml)", type: "Beer", volume: 500, alcoholPercentage: 5 },
   { name: "PSB (350ml)", type: "Beer", volume: 350, alcoholPercentage: 5.5 },
   { name: "PSB (500ml)", type: "Beer", volume: 500, alcoholPercentage: 5.5 },
+  { name: "Normal Beer (350ml)", type: "Beer", volume: 350, alcoholPercentage: 5 },
+  { name: "Normal Beer (500ml)", type: "Beer", volume: 500, alcoholPercentage: 5 },
   { name: "Highball (350ml)", type: "Highball", volume: 350, alcoholPercentage: 7 },
   { name: "Highball (500ml)", type: "Highball", volume: 500, alcoholPercentage: 7 },
 ];

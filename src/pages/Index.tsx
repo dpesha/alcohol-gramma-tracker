@@ -23,7 +23,7 @@ const Index = () => {
   return (
     <div className="min-h-screen p-4 md:p-6 space-y-4 md:space-y-6 max-w-lg mx-auto">
       <div className="text-center space-y-2 mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Alcohol Tracker</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Responsible Drinking</h1>
         <p className="text-sm md:text-base text-muted-foreground">Track your daily alcohol consumption</p>
       </div>
       

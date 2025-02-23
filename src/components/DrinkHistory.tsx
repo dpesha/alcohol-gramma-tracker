@@ -80,7 +80,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Drink Calendar</h2>
       </div>
 
       <Calendar
