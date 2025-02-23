@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
@@ -46,9 +45,9 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
   };
 
   return (
-    <Card className="glass-card p-4 w-full max-w-md mx-auto mt-6 fade-in">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-semibold">Alcohol Intake Over Time</h2>
+    <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-2 md:space-y-0">
+        <h2 className="text-lg md:text-xl font-semibold">Alcohol Intake Over Time</h2>
         <div className="flex items-center gap-1">
           <Button
             variant="outline"
@@ -57,7 +56,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="min-w-[100px] text-center text-sm">
+          <span className="min-w-[100px] text-center text-sm md:text-base">
             {format(currentMonth, 'MMMM yyyy')}
           </span>
           <Button
@@ -69,7 +68,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           </Button>
         </div>
       </div>
-      <div className="h-[250px] w-full">
+      <div className="h-[200px] md:h-[250px] w-full">
         {dailyData.length > 0 ? (
           <ChartContainer
             className="h-full"
@@ -84,23 +83,23 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <LineChart 
               data={dailyData}
-              margin={{ top: 10, right: 30, left: 10, bottom: 20 }}
+              margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
             >
               <XAxis
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={11}
+                fontSize={10}
                 tickFormatter={(date) => format(new Date(date), 'd')}
                 dy={10}
               />
               <YAxis
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={11}
+                fontSize={10}
                 label={{ 
                   value: 'Alcohol (g)', 
                   angle: -90, 
                   position: 'insideLeft',
-                  style: { fontSize: '11px' },
+                  style: { fontSize: '10px' },
                   dx: -10
                 }}
               />
@@ -118,7 +117,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
             </LineChart>
           </ChartContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-muted-foreground">
+          <div className="h-full flex items-center justify-center text-sm md:text-base text-muted-foreground">
             No data available for {format(currentMonth, 'MMMM yyyy')}
           </div>
         )}

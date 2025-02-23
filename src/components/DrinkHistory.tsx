@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -72,7 +71,6 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   };
 
   const handleDateClick = (date: Date | undefined) => {
-    // Always open the dialog when a date is clicked, even if it's the same date
     setIsDialogOpen(true);
     if (date) {
       setSelectedDate(date);
@@ -80,9 +78,9 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   };
 
   return (
-    <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
+    <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Drink History</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
       </div>
 
       <Calendar
@@ -92,10 +90,11 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
         formatters={formatters}
+        className="w-full"
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-h-[90vh] w-[95vw] max-w-md overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>
               Drinks for {selectedDate ? format(selectedDate, 'PPP') : ''}
@@ -112,24 +111,24 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
             />
             
             {selectedDrinks.length > 0 && (
-              <div className="mt-4">
+              <div className="mt-4 overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Volume (ml)</TableHead>
-                      <TableHead>Alcohol (%)</TableHead>
-                      <TableHead>Total (g)</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead className="whitespace-nowrap">Type</TableHead>
+                      <TableHead className="whitespace-nowrap">Volume (ml)</TableHead>
+                      <TableHead className="whitespace-nowrap">Alcohol (%)</TableHead>
+                      <TableHead className="whitespace-nowrap">Total (g)</TableHead>
+                      <TableHead className="whitespace-nowrap">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {selectedDrinks.map((drink, index) => (
                       <TableRow key={index}>
-                        <TableCell>{drink.type}</TableCell>
-                        <TableCell>{drink.volume}</TableCell>
-                        <TableCell>{drink.alcoholPercentage}%</TableCell>
-                        <TableCell>{drink.alcoholGrams.toFixed(1)}g</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.type}</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.volume}</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.alcoholPercentage}%</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.alcoholGrams.toFixed(1)}g</TableCell>
                         <TableCell>
                           <Button
                             variant="destructive"

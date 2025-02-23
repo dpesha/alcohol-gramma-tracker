@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -62,27 +61,27 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
   };
 
   return (
-    <Card className="glass-card p-6 w-full max-w-md mx-auto mt-6 fade-in">
+    <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <Tabs defaultValue="daily" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="daily">Daily</TabsTrigger>
-          <TabsTrigger value="weekly">Weekly</TabsTrigger>
-          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+          <TabsTrigger value="daily" className="text-sm md:text-base">Daily</TabsTrigger>
+          <TabsTrigger value="weekly" className="text-sm md:text-base">Weekly</TabsTrigger>
+          <TabsTrigger value="monthly" className="text-sm md:text-base">Monthly</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="daily" className="space-y-4 mt-4">
+        <TabsContent value="daily" className="space-y-3 md:space-y-4 mt-4">
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Drinks</span>
-            <span className="font-medium">{dailySummary.totalDrinks}</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Drinks</span>
+            <span className="text-sm md:text-base font-medium">{dailySummary.totalDrinks}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Alcohol</span>
-            <span className="font-medium">{dailySummary.totalAlcohol.toFixed(1)}g</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Alcohol</span>
+            <span className="text-sm md:text-base font-medium">{dailySummary.totalAlcohol.toFixed(1)}g</span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Daily Limit ({DAILY_LIMIT}g)</span>
-              <span className="font-medium">{((dailySummary.totalAlcohol / DAILY_LIMIT) * 100).toFixed(1)}%</span>
+              <span className="text-sm md:text-base text-muted-foreground">Daily Limit ({DAILY_LIMIT}g)</span>
+              <span className="text-sm md:text-base font-medium">{((dailySummary.totalAlcohol / DAILY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
               value={getProgressValue(dailySummary.totalAlcohol, DAILY_LIMIT)}
@@ -91,25 +90,25 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="weekly" className="space-y-4 mt-4">
+        <TabsContent value="weekly" className="space-y-3 md:space-y-4 mt-4">
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Drinks</span>
-            <span className="font-medium">{weeklySummary.totalDrinks}</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Drinks</span>
+            <span className="text-sm md:text-base font-medium">{weeklySummary.totalDrinks}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Alcohol</span>
-            <span className="font-medium">{weeklySummary.totalAlcohol.toFixed(1)}g</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Alcohol</span>
+            <span className="text-sm md:text-base font-medium">{weeklySummary.totalAlcohol.toFixed(1)}g</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Daily Average</span>
-            <span className="font-medium">
+            <span className="text-sm md:text-base text-muted-foreground">Daily Average</span>
+            <span className="text-sm md:text-base font-medium">
               {(weeklySummary.totalAlcohol / 7).toFixed(1)}g
             </span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Weekly Limit ({WEEKLY_LIMIT}g)</span>
-              <span className="font-medium">{((weeklySummary.totalAlcohol / WEEKLY_LIMIT) * 100).toFixed(1)}%</span>
+              <span className="text-sm md:text-base text-muted-foreground">Weekly Limit ({WEEKLY_LIMIT}g)</span>
+              <span className="text-sm md:text-base font-medium">{((weeklySummary.totalAlcohol / WEEKLY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
               value={getProgressValue(weeklySummary.totalAlcohol, WEEKLY_LIMIT)}
@@ -118,25 +117,25 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="monthly" className="space-y-4 mt-4">
+        <TabsContent value="monthly" className="space-y-3 md:space-y-4 mt-4">
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Drinks</span>
-            <span className="font-medium">{monthlySummary.totalDrinks}</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Drinks</span>
+            <span className="text-sm md:text-base font-medium">{monthlySummary.totalDrinks}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Alcohol</span>
-            <span className="font-medium">{monthlySummary.totalAlcohol.toFixed(1)}g</span>
+            <span className="text-sm md:text-base text-muted-foreground">Total Alcohol</span>
+            <span className="text-sm md:text-base font-medium">{monthlySummary.totalAlcohol.toFixed(1)}g</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Daily Average</span>
-            <span className="font-medium">
+            <span className="text-sm md:text-base text-muted-foreground">Daily Average</span>
+            <span className="text-sm md:text-base font-medium">
               {(monthlySummary.totalAlcohol / 30).toFixed(1)}g
             </span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Monthly Limit ({MONTHLY_LIMIT}g)</span>
-              <span className="font-medium">{((monthlySummary.totalAlcohol / MONTHLY_LIMIT) * 100).toFixed(1)}%</span>
+              <span className="text-sm md:text-base text-muted-foreground">Monthly Limit ({MONTHLY_LIMIT}g)</span>
+              <span className="text-sm md:text-base font-medium">{((monthlySummary.totalAlcohol / MONTHLY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
               value={getProgressValue(monthlySummary.totalAlcohol, MONTHLY_LIMIT)}
