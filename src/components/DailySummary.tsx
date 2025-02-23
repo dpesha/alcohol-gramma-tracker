@@ -51,10 +51,14 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
     return Math.min((current / limit) * 100, 100);
   };
 
-  const getProgressColor = (percentage: number) => {
-    if (percentage >= 100) return "bg-destructive";
-    if (percentage >= 75) return "bg-yellow-500";
-    return "bg-primary";
+  const getProgressClassName = (percentage: number) => {
+    if (percentage >= 100) {
+      return "h-full w-full flex-1 bg-destructive transition-all";
+    }
+    if (percentage >= 75) {
+      return "h-full w-full flex-1 bg-yellow-500 transition-all";
+    }
+    return "h-full w-full flex-1 bg-primary transition-all";
   };
 
   return (
@@ -81,8 +85,8 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
               <span className="font-medium">{((dailySummary.totalAlcohol / DAILY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
-              value={getProgressValue(dailySummary.totalAlcohol, DAILY_LIMIT)} 
-              className={getProgressColor(dailySummary.totalAlcohol / DAILY_LIMIT * 100)}
+              value={getProgressValue(dailySummary.totalAlcohol, DAILY_LIMIT)}
+              indicatorClassName={getProgressClassName(dailySummary.totalAlcohol / DAILY_LIMIT * 100)}
             />
           </div>
         </TabsContent>
@@ -108,8 +112,8 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
               <span className="font-medium">{((weeklySummary.totalAlcohol / WEEKLY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
-              value={getProgressValue(weeklySummary.totalAlcohol, WEEKLY_LIMIT)} 
-              className={getProgressColor(weeklySummary.totalAlcohol / WEEKLY_LIMIT * 100)}
+              value={getProgressValue(weeklySummary.totalAlcohol, WEEKLY_LIMIT)}
+              indicatorClassName={getProgressClassName(weeklySummary.totalAlcohol / WEEKLY_LIMIT * 100)}
             />
           </div>
         </TabsContent>
@@ -135,8 +139,8 @@ const DailySummary = ({ drinks }: DailySummaryProps) => {
               <span className="font-medium">{((monthlySummary.totalAlcohol / MONTHLY_LIMIT) * 100).toFixed(1)}%</span>
             </div>
             <Progress 
-              value={getProgressValue(monthlySummary.totalAlcohol, MONTHLY_LIMIT)} 
-              className={getProgressColor(monthlySummary.totalAlcohol / MONTHLY_LIMIT * 100)}
+              value={getProgressValue(monthlySummary.totalAlcohol, MONTHLY_LIMIT)}
+              indicatorClassName={getProgressClassName(monthlySummary.totalAlcohol / MONTHLY_LIMIT * 100)}
             />
           </div>
         </TabsContent>
