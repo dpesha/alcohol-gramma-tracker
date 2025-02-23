@@ -71,10 +71,11 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
     onAddDrink(drink);
   };
 
-  const handleDateSelect = (date: Date | undefined) => {
+  const handleDateClick = (date: Date | undefined) => {
+    // Always open the dialog when a date is clicked, even if it's the same date
+    setIsDialogOpen(true);
     if (date) {
       setSelectedDate(date);
-      setIsDialogOpen(true);
     }
   };
 
@@ -87,7 +88,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
       <Calendar
         mode="single"
         selected={selectedDate}
-        onSelect={handleDateSelect}
+        onSelect={handleDateClick}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
         formatters={formatters}
