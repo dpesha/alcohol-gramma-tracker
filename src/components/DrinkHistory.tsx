@@ -18,7 +18,7 @@ interface DrinkHistoryProps {
 }
 
 const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingDrink, setEditingDrink] = useState<{ drink: Drink; index: number } | null>(null);
   const [isAddingDrink, setIsAddingDrink] = useState(false);
@@ -96,8 +96,10 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
         mode="single"
         selected={selectedDate}
         onSelect={(date) => {
-          setSelectedDate(date);
-          if (date) setIsDialogOpen(true);
+          if (date) {
+            setSelectedDate(date);
+            setIsDialogOpen(true);
+          }
         }}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
@@ -111,8 +113,12 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
               Drinks for {selectedDate ? format(selectedDate, 'PPP') : ''}
             </DialogTitle>
           </DialogHeader>
-          {selectedDrinks.length > 0 ? (
-            <div className="max-h-[60vh] overflow-auto">
+          <DrinkForm 
+            onAddDrink={handleAddNewDrink}
+            date={selectedDate}
+          />
+          {selectedDrinks.length > 0 && (
+            <div className="max-h-[60vh] overflow-auto mt-4">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -150,47 +156,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
                   ))}
                 </TableBody>
               </Table>
-              <div className="mt-4 flex justify-end">
-                <Button 
-                  onClick={() => setIsAddingDrink(true)}
-                  size="sm"
-                >
-                  <Plus className="mr-1" />
-                  Add Another Drink
-                </Button>
-              </div>
             </div>
-          ) : (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground mb-4">No drinks recorded for this date</p>
-              <Button 
-                onClick={() => setIsAddingDrink(true)}
-                size="sm"
-              >
-                <Plus className="mr-1" />
-                Add First Drink
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isAddingDrink} onOpenChange={setIsAddingDrink}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Drink</DialogTitle>
-          </DialogHeader>
-          {selectedDate && (
-            <DrinkForm 
-              onAddDrink={handleAddNewDrink}
-              initialDrink={{ 
-                type: "Beer",
-                volume: 350,
-                alcoholPercentage: 5,
-                alcoholGrams: 0,
-                date: selectedDate 
-              }}
-            />
           )}
         </DialogContent>
       </Dialog>
@@ -204,6 +170,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
             <DrinkForm 
               onAddDrink={handleEditSubmit}
               initialDrink={editingDrink.drink}
+              date={selectedDate}
             />
           )}
         </DialogContent>
