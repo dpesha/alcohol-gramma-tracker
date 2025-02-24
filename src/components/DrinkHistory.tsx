@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 import { Button } from "@/components/ui/button";
 import DrinkForm, { Drink } from "./DrinkForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,7 +22,7 @@ interface DrinkHistoryProps {
 
 const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [isDialogOpen, setIsDialogOpen] = useState(true); // Set to true by default
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Filter drinks for selected date using start of day comparison
   const selectedDrinks = drinks.filter(drink => 
@@ -53,14 +53,17 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   const handleDateClick = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
-      setIsDialogOpen(true);
+      // Only open dialog if the selected date is today
+      if (isToday(date)) {
+        setIsDialogOpen(true);
+      }
     }
   };
 
   const handleAddNewDrink = (drink: Drink) => {
     onAddDrink({
       ...drink,
-      date: selectedDate // Use the Date object directly
+      date: selectedDate
     });
   };
 
