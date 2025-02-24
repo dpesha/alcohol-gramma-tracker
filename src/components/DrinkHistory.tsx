@@ -1,13 +1,16 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import DrinkForm, { Drink } from "./DrinkForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Trash } from "lucide-react";
 
 interface DrinkHistoryProps {
   drinks: Drink[];
@@ -19,6 +22,11 @@ interface DrinkHistoryProps {
 const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Filter drinks for selected date
+  const selectedDrinks = drinks.filter(drink => 
+    format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+  );
   
   // Create dots for dates with drinks
   const datesWithDrinks = drinks.reduce((acc: { [key: string]: number }, drink) => {
@@ -41,155 +49,112 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
     }
   };
 
-  const formatters = {
-    DayContent: (date: Date) => {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      if (dateStr in datesWithDrinks) {
-        return (
-          <div className="relative w-full h-full flex items-center justify-center">
-            <span>{date.getDate()}</span>
-            <span className="absolute -bottom-3 text-[0.6rem] font-medium">
-              {datesWithDrinks[dateStr].toFixed(1)}g
-            </span>
-          </div>
-        );
-      }
-      return date.getDate();
+  const handleDateClick = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      setIsDialogOpen(true);
     }
   };
 
-  const handleAddDrink = (drink: Drink) => {
+  const handleAddNewDrink = (drink: Drink) => {
     onAddDrink(drink);
-    setIsDialogOpen(false);
   };
-
-  const dailyDrinks = drinks.filter(drink => 
-    format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
-  );
-
-  const totalAlcoholGrams = dailyDrinks.reduce((sum, drink) => sum + drink.alcoholGrams, 0);
 
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
-        <div className="text-sm text-muted-foreground">
-          Total Alcohol: {totalAlcoholGrams.toFixed(1)}g
-        </div>
       </div>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant={"outline"}
-            className={
-              "w-full justify-start text-left font-normal" +
-              (selectedDate ? " text-sm" : " text-muted-foreground")
-            }
-          >
-            {selectedDate ? (
-              format(selectedDate, "PPP")
-            ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            modifiers={modifiers}
-            modifiersStyles={modifiersStyles}
-            formatters={formatters}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-
-      <Button onClick={() => setIsDialogOpen(true)} className="w-full mt-2">
-        Add Drink
-      </Button>
-
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button variant="destructive" className="w-full mt-2" disabled={dailyDrinks.length === 0}>
-            Delete All Drinks
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete all drinks for {format(selectedDate, "PPP")}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              dailyDrinks.forEach(drink => onDeleteDrink(drink));
-            }}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <div className="mt-4">
-        <h3 className="text-md font-semibold mb-2">Drinks for {format(selectedDate, "PPP")}</h3>
-        <ScrollArea className="rounded-md border h-[200px] w-full">
-          {dailyDrinks.length > 0 ? (
-            dailyDrinks.map((drink, index) => (
-              <div key={index} className="flex items-center justify-between p-2 border-b last:border-b-0">
-                <div>
-                  <div className="font-medium">{drink.type}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {drink.volume}ml, {drink.alcoholPercentage}%
+      <div className="w-full flex justify-center">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateClick}
+          modifiers={modifiers}
+          modifiersStyles={modifiersStyles}
+          components={{
+            DayContent: ({ date }) => {
+              const dateStr = format(date, 'yyyy-MM-dd');
+              if (dateStr in datesWithDrinks) {
+                return (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <span>{date.getDate()}</span>
+                    <span className="absolute -bottom-3 text-[0.6rem] font-medium">
+                      {datesWithDrinks[dateStr].toFixed(1)}g
+                    </span>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="icon" onClick={() => onEditDrink(drink)}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.862 4.487l1.687-1.687a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H15.75A2.25 2.25 0 0118 8.25V11a.75.75 0 011.5 0v-2.75A3.75 3.75 0 0015.75 4.5H5.25A3.75 3.75 0 001.5 8.25v10.5A3.75 3.75 0 005.25 22.5h10.5A3.75 3.75 0 0019.5 18.75V14a.75.75 0 01-1.5 0z"
-                      />
-                    </svg>
-                  </Button>
-                  <Button variant="destructive" size="icon" onClick={() => onDeleteDrink(drink)}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-sm text-muted-foreground p-2">No drinks for this date.</div>
-          )}
-        </ScrollArea>
+                );
+              }
+              return date.getDate();
+            }
+          }}
+          className="w-full"
+          classNames={{
+            months: "w-full",
+            month: "w-full",
+            table: "w-full",
+            head_row: "w-full flex justify-between",
+            row: "w-full flex justify-between",
+            day: "w-8 h-8 md:w-10 md:h-10 p-0",
+            head_cell: "w-8 md:w-10 text-center",
+            cell: "w-8 md:w-10 text-center p-0",
+          }}
+        />
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="max-h-[90vh] w-[95vw] max-w-md overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Add Drink for {format(selectedDate, "PPP")}</DialogTitle>
+            <DialogTitle>
+              Drinks for {format(selectedDate, 'PPP')}
+            </DialogTitle>
             <DialogDescription>
-              Add a new drink to your history for the selected date.
+              Add drinks or manage existing entries
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <DrinkForm onAddDrink={handleAddDrink} date={selectedDate} />
+          
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <DrinkForm 
+              onAddDrink={handleAddNewDrink}
+              date={selectedDate}
+            />
+            
+            {selectedDrinks.length > 0 && (
+              <div className="mt-4 overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">Type</TableHead>
+                      <TableHead className="whitespace-nowrap">Volume (ml)</TableHead>
+                      <TableHead className="whitespace-nowrap">Alcohol (%)</TableHead>
+                      <TableHead className="whitespace-nowrap">Total (g)</TableHead>
+                      <TableHead className="whitespace-nowrap">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedDrinks.map((drink, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="whitespace-nowrap">{drink.type}</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.volume}</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.alcoholPercentage}%</TableCell>
+                        <TableCell className="whitespace-nowrap">{drink.alcoholGrams.toFixed(1)}g</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => onDeleteDrink(drink)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => setIsDialogOpen(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Card>
