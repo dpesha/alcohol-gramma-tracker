@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash } from "lucide-react";
+import { DayContent } from "react-day-picker";
 
 interface DrinkHistoryProps {
   drinks: Drink[];
@@ -86,7 +87,11 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
                   </div>
                 );
               }
-              return date.getDate();
+              return (
+                <div className="flex items-center justify-center">
+                  {date.getDate()}
+                </div>
+              );
             }
           }}
           className="w-full"
