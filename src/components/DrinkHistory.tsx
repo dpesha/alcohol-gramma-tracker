@@ -80,18 +80,30 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg md:text-xl font-semibold">Drink Calendar</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
       </div>
 
-      <Calendar
-        mode="single"
-        selected={selectedDate}
-        onSelect={handleDateClick}
-        modifiers={modifiers}
-        modifiersStyles={modifiersStyles}
-        formatters={formatters}
-        className="w-full"
-      />
+      <div className="w-full flex justify-center">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleDateClick}
+          modifiers={modifiers}
+          modifiersStyles={modifiersStyles}
+          formatters={formatters}
+          className="w-full"
+          classNames={{
+            months: "w-full",
+            month: "w-full",
+            table: "w-full",
+            head_row: "w-full flex justify-between",
+            row: "w-full flex justify-between",
+            day: "w-8 h-8 md:w-10 md:h-10 p-0",
+            head_cell: "w-8 md:w-10 text-center",
+            cell: "w-8 md:w-10 text-center p-0",
+          }}
+        />
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-h-[90vh] w-[95vw] max-w-md overflow-hidden flex flex-col">

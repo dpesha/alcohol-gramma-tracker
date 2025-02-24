@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
@@ -47,7 +48,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-2 md:space-y-0">
-        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Alcohol Intake Over Time</h2>
         <div className="flex items-center gap-1">
           <Button
             variant="outline"
@@ -83,25 +84,27 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <LineChart 
               data={dailyData}
-              margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+              margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
             >
               <XAxis
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={10}
+                fontSize={8}
                 tickFormatter={(date) => format(new Date(date), 'd')}
                 dy={10}
+                interval="preserveStartEnd"
               />
               <YAxis
                 stroke="hsl(var(--muted-foreground))"
-                fontSize={10}
+                fontSize={8}
                 label={{ 
                   value: 'Alcohol (g)', 
                   angle: -90, 
                   position: 'insideLeft',
-                  style: { fontSize: '10px' },
-                  dx: -10
+                  style: { fontSize: '8px' },
+                  dx: -15
                 }}
+                width={30}
               />
               <Tooltip 
                 labelFormatter={(label) => format(new Date(label), 'PPP')}
