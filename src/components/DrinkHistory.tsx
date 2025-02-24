@@ -60,7 +60,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   const handleAddNewDrink = (drink: Drink) => {
     onAddDrink({
       ...drink,
-      date: format(selectedDate, 'yyyy-MM-dd')
+      date: selectedDate // Use the Date object directly
     });
   };
 
