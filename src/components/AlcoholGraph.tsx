@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
 import type { Drink } from "./DrinkForm";
@@ -22,7 +22,7 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
 
   // Group drinks by date and calculate total alcohol for each day
   const dailyData = monthlyDrinks.reduce((acc: { date: string; total: number }[], drink) => {
-    const date = new Date(drink.date).toLocaleDateString();
+    const date = format(new Date(drink.date), 'yyyy-MM-dd'); // Use standardized date format
     const existingDay = acc.find(d => d.date === date);
     
     if (existingDay) {
@@ -84,14 +84,16 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
           >
             <LineChart 
               data={dailyData}
-              margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+              margin={{ top: 10, right: 25, left: -15, bottom: 20 }}
             >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
               <XAxis
                 dataKey="date"
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={8}
                 tickFormatter={(date) => format(new Date(date), 'd')}
                 dy={10}
+                tick={{ transform: 'translate(0, 6)' }}
                 interval="preserveStartEnd"
               />
               <YAxis
@@ -104,7 +106,8 @@ const AlcoholGraph = ({ drinks }: AlcoholGraphProps) => {
                   style: { fontSize: '8px' },
                   dx: -15
                 }}
-                width={30}
+                width={35}
+                tickSize={3}
               />
               <Tooltip 
                 labelFormatter={(label) => format(new Date(label), 'PPP')}
