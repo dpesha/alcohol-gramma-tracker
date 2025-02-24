@@ -24,7 +24,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Filter drinks for selected date
+  // Filter drinks for selected date using start of day comparison
   const selectedDrinks = drinks.filter(drink => 
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
@@ -58,7 +58,10 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   };
 
   const handleAddNewDrink = (drink: Drink) => {
-    onAddDrink(drink);
+    onAddDrink({
+      ...drink,
+      date: format(selectedDate, 'yyyy-MM-dd')
+    });
   };
 
   return (
