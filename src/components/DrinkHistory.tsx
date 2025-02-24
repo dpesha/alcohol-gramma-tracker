@@ -51,12 +51,13 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   };
 
   const handleDateClick = (date: Date | undefined) => {
+    setIsDialogOpen(true);
     if (date) {
       setSelectedDate(date);
       // Only open dialog if the selected date is today
-      if (isToday(date)) {
-        setIsDialogOpen(true);
-      }
+      // if (isToday(date)) {
+       
+      // }
     }
   };
 
