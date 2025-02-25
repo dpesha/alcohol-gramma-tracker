@@ -1,171 +1,133 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { format, isToday } from "date-fns";
+import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-import DrinkForm, { Drink } from "./DrinkForm";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2 } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash } from "lucide-react";
-import { DayContent } from "react-day-picker";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
+import type { Drink } from "./DrinkForm";
 
 interface DrinkHistoryProps {
   drinks: Drink[];
-  onDeleteDrink: (drink: Drink) => void;
-  onAddDrink: (drink: Drink) => void;
-  onEditDrink: (drink: Drink) => void;
 }
 
-const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkHistoryProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Filter drinks for selected date using start of day comparison
-  const selectedDrinks = drinks.filter(drink => 
-    format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+  // Filter drinks for the current month
+  const monthlyDrinks = drinks.filter(drink => 
+    isSameMonth(new Date(drink.date), currentMonth)
   );
-  
-  // Create dots for dates with drinks
-  const datesWithDrinks = drinks.reduce((acc: { [key: string]: number }, drink) => {
-    const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
-    acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
+
+  // Group drinks by date and calculate total alcohol for each day
+  const dailyData = monthlyDrinks.reduce((acc: { date: string; total: number }[], drink) => {
+    const date = format(new Date(drink.date), 'yyyy-MM-dd'); // Use standardized date format
+    const existingDay = acc.find(d => d.date === date);
+    
+    if (existingDay) {
+      existingDay.total += drink.alcoholGrams;
+    } else {
+      acc.push({ date, total: drink.alcoholGrams });
+    }
+    
     return acc;
-  }, {});
+  }, []);
 
-  const modifiers = {
-    hasDrink: (date: Date) => {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      return dateStr in datesWithDrinks;
-    }
+  // Sort data by date
+  dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const handlePreviousMonth = () => {
+    setCurrentMonth(prev => subMonths(prev, 1));
   };
 
-  const modifiersStyles = {
-    hasDrink: {
-      color: 'white',
-      backgroundColor: 'hsl(var(--primary))',
-      borderRadius: '50%',
-    }
-  };
-
-  const handleDateClick = (date: Date | undefined) => {
-    setIsDialogOpen(true);
-    if (date) {
-      setSelectedDate(date);
-    }
-  };
-
-  const handleAddNewDrink = (drink: Drink) => {
-    onAddDrink({
-      ...drink,
-      date: selectedDate
-    });
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => addMonths(prev, 1));
   };
 
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg md:text-xl font-semibold">Drink Calendar</h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-2 md:space-y-0">
+        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePreviousMonth}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="min-w-[100px] text-center text-sm md:text-base">
+            {format(currentMonth, 'MMMM yyyy')}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNextMonth}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-
-      <div className="w-full flex justify-center">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDateClick}
-          modifiers={modifiers}
-          modifiersStyles={modifiersStyles}
-          components={{
-            DayContent: ({ date }) => {
-              const dateStr = format(date, 'yyyy-MM-dd');
-              if (dateStr in datesWithDrinks) {
-                return (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <span>{date.getDate()}</span>
-                    <span className="absolute -bottom-3 text-[0.6rem] font-medium text-green-700">
-                      {datesWithDrinks[dateStr].toFixed(1)}g
-                    </span>
-                  </div>
-                );
-              }
-              return (
-                <div className="flex items-center justify-center">
-                  {date.getDate()}
-                </div>
-              );
-            }
-          }}
-          className="w-full"
-          classNames={{
-            months: "w-full",
-            month: "w-full",
-            table: "w-full",
-            head_row: "w-full flex justify-between",
-            row: "w-full flex justify-between",
-            day: "w-8 h-8 md:w-10 md:h-10 p-0",
-            head_cell: "w-8 md:w-10 text-center",
-            cell: "w-8 md:w-10 text-center p-0",
-          }}
-        />
-      </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-h-[90vh] w-[95vw] max-w-md overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>
-              Drinks for {format(selectedDate, 'PPP')}
-            </DialogTitle>
-            <DialogDescription>
-              Add drinks or manage existing entries
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <DrinkForm 
-              onAddDrink={handleAddNewDrink}
-              date={selectedDate}
-            />
-            
-            {selectedDrinks.length > 0 && (
-              <div className="mt-4 overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="whitespace-nowrap">Type</TableHead>
-                      <TableHead className="whitespace-nowrap">Volume (ml)</TableHead>
-                      <TableHead className="whitespace-nowrap">Alcohol (%)</TableHead>
-                      <TableHead className="whitespace-nowrap">Total (g)</TableHead>
-                      <TableHead className="whitespace-nowrap">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedDrinks.map((drink, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="whitespace-nowrap">{drink.type}</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.volume}</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.alcoholPercentage}%</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.alcoholGrams.toFixed(1)}g</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => onDeleteDrink(drink)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+      <div className="h-[200px] md:h-[250px] w-full">
+        {dailyData.length > 0 ? (
+          <ChartContainer
+            className="h-full"
+            config={{
+              line: {
+                theme: {
+                  light: "hsl(var(--primary))",
+                  dark: "hsl(var(--primary))",
+                },
+              },
+            }}
+          >
+            <LineChart 
+              data={dailyData}
+              margin={{ top: 10, right: 25, left: -15, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
+              <XAxis
+                dataKey="date"
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={8}
+                tickFormatter={(date) => format(new Date(date), 'd')}
+                dy={10}
+                tick={{ transform: 'translate(0, 6)' }}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={8}
+                label={{ 
+                  value: 'Alcohol (g)', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  style: { fontSize: '8px' },
+                  dx: -15
+                }}
+                width={35}
+                tickSize={3}
+              />
+              <Tooltip 
+                labelFormatter={(label) => format(new Date(label), 'PPP')}
+                formatter={(value: number) => [`${value.toFixed(1)}g`, 'Alcohol']}
+              />
+              <Line
+                type="monotone"
+                dataKey="total"
+                strokeWidth={2}
+                dot={true}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center text-sm md:text-base text-muted-foreground">
+            No data available for {format(currentMonth, 'MMMM yyyy')}
           </div>
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
     </Card>
   );
 };

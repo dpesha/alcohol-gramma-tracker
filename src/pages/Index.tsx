@@ -2,8 +2,8 @@
 import { useState } from "react";
 import DrinkForm, { Drink } from "@/components/DrinkForm";
 import DailySummary from "@/components/DailySummary";
-import AlcoholGraph from "@/components/AlcoholGraph";
 import DrinkHistory from "@/components/DrinkHistory";
+import DrinkCalendar from "@/components/DrinkCalendar";
 
 const Index = () => {
   const [drinks, setDrinks] = useState<Drink[]>([]);
@@ -29,14 +29,14 @@ const Index = () => {
         <p className="text-sm md:text-base text-muted-foreground">Track your daily alcohol consumption</p>
       </div>
       
-      <DrinkHistory 
+      <DrinkCalendar 
         drinks={drinks} 
         onDeleteDrink={handleDeleteDrink}
         onAddDrink={handleAddDrink}
         onEditDrink={handleEditDrink}
       />
       <DailySummary drinks={drinks} />
-      <AlcoholGraph drinks={drinks} />
+      <DrinkHistory drinks={drinks} />
     </div>
   );
 };
