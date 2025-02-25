@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { format, isToday } from "date-fns";
@@ -24,24 +24,22 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Calculate dates with drinks using memoization to improve performance
-  const datesWithDrinks = useCallback(() => {
-    return drinks.reduce((acc: { [key: string]: number }, drink) => {
-      const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
-      acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
-      return acc;
-    }, {});
-  }, [drinks]);
-
   // Filter drinks for selected date using start of day comparison
   const selectedDrinks = drinks.filter(drink => 
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
+  
+  // Create dots for dates with drinks
+  const datesWithDrinks = drinks.reduce((acc: { [key: string]: number }, drink) => {
+    const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
+    acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
+    return acc;
+  }, {});
 
   const modifiers = {
     hasDrink: (date: Date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
-      return dateStr in datesWithDrinks();
+      return dateStr in datesWithDrinks;
     }
   };
 
@@ -53,11 +51,13 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   };
 
   const handleDateClick = (date: Date | undefined) => {
+    setIsDialogOpen(true);
     if (date) {
       setSelectedDate(date);
-      if (isToday(date)) {
-        setIsDialogOpen(true);
-      }
+      // Only open dialog if the selected date is today
+      // if (isToday(date)) {
+       
+      // }
     }
   };
 
@@ -71,7 +71,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
   return (
     <Card className="glass-card p-4 md:p-6 w-full mx-auto fade-in">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg md:text-xl font-semibold">Drink History</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Drink Calendar</h2>
       </div>
 
       <div className="w-full flex justify-center">
@@ -84,13 +84,12 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
           components={{
             DayContent: ({ date }) => {
               const dateStr = format(date, 'yyyy-MM-dd');
-              const drinkData = datesWithDrinks();
-              if (dateStr in drinkData) {
+              if (dateStr in datesWithDrinks) {
                 return (
                   <div className="relative w-full h-full flex items-center justify-center">
                     <span>{date.getDate()}</span>
                     <span className="absolute -bottom-3 text-[0.6rem] font-medium">
-                      {drinkData[dateStr].toFixed(1)}g
+                      {datesWithDrinks[dateStr].toFixed(1)}g
                     </span>
                   </div>
                 );
