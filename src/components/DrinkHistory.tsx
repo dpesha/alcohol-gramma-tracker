@@ -47,6 +47,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
     hasDrink: {
       color: 'white',
       backgroundColor: 'hsl(var(--primary))',
+      borderRadius: '50%',
     }
   };
 
@@ -54,10 +55,6 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
     setIsDialogOpen(true);
     if (date) {
       setSelectedDate(date);
-      // Only open dialog if the selected date is today
-      // if (isToday(date)) {
-       
-      // }
     }
   };
 
@@ -88,7 +85,7 @@ const DrinkHistory = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkH
                 return (
                   <div className="relative w-full h-full flex items-center justify-center">
                     <span>{date.getDate()}</span>
-                    <span className="absolute -bottom-3 text-[0.6rem] font-medium">
+                    <span className="absolute -bottom-3 text-[0.6rem] font-medium text-green-700">
                       {datesWithDrinks[dateStr].toFixed(1)}g
                     </span>
                   </div>
