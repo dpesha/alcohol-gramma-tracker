@@ -23,9 +23,12 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
   
-  const datesWithDrinks = drinks.reduce((acc: { [key: string]: number }, drink) => {
+  const datesWithDrinks = drinks.reduce((acc: { [key: string]: { grams: number, isNoDrinkDay: boolean } }, drink) => {
     const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
-    acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
+    acc[dateStr] = {
+      grams: drink.type === "no drink day" ? 0 : (acc[dateStr]?.grams || 0) + drink.alcoholGrams,
+      isNoDrinkDay: drink.type === "no drink day"
+    };
     return acc;
   }, {});
 
@@ -33,6 +36,10 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     hasDrink: (date: Date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       return dateStr in datesWithDrinks;
+    },
+    noDrinkDay: (date: Date) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      return datesWithDrinks[dateStr]?.isNoDrinkDay;
     }
   };
 
@@ -40,6 +47,11 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     hasDrink: {
       color: 'white',
       backgroundColor: 'hsl(var(--primary))',
+      borderRadius: '50%',
+    },
+    noDrinkDay: {
+      color: 'white',
+      backgroundColor: 'rgb(255 182 193)',
       borderRadius: '50%',
     }
   };
@@ -78,8 +90,12 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
                 return (
                   <div className="relative w-full h-full flex items-center justify-center">
                     <span>{date.getDate()}</span>
-                    <span className="absolute -bottom-3 text-[0.6rem] font-medium text-green-700">
-                      {datesWithDrinks[dateStr].toFixed(1)}g
+                    <span className={`absolute -bottom-3 text-[0.6rem] font-medium ${
+                      datesWithDrinks[dateStr].isNoDrinkDay 
+                        ? 'text-pink-600' 
+                        : 'text-green-700'
+                    }`}>
+                      {datesWithDrinks[dateStr].grams.toFixed(1)}g
                     </span>
                   </div>
                 );
@@ -120,6 +136,7 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
             <DrinkForm 
               onAddDrink={handleAddNewDrink}
               date={selectedDate}
+              drinks={drinks}
             />
             
             {selectedDrinks.length > 0 && (
