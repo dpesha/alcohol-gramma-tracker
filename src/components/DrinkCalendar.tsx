@@ -123,25 +123,25 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
             />
             
             {selectedDrinks.length > 0 && (
-              <div className="mt-4 overflow-x-auto">
+              <div className="mt-4">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="whitespace-nowrap">Type</TableHead>
-                      <TableHead className="whitespace-nowrap">Volume (ml)</TableHead>
-                      <TableHead className="whitespace-nowrap">Alcohol (%)</TableHead>
-                      <TableHead className="whitespace-nowrap">Total (g)</TableHead>
-                      <TableHead className="whitespace-nowrap">Actions</TableHead>
+                      <TableHead className="w-20">Type</TableHead>
+                      <TableHead className="w-20">Vol.</TableHead>
+                      <TableHead className="w-16">ABV</TableHead>
+                      <TableHead className="w-16">Total</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {selectedDrinks.map((drink, index) => (
                       <TableRow key={index}>
-                        <TableCell className="whitespace-nowrap">{drink.type}</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.volume}</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.alcoholPercentage}%</TableCell>
-                        <TableCell className="whitespace-nowrap">{drink.alcoholGrams.toFixed(1)}g</TableCell>
-                        <TableCell>
+                        <TableCell>{drink.type}</TableCell>
+                        <TableCell>{drink.volume}ml</TableCell>
+                        <TableCell>{drink.alcoholPercentage}%</TableCell>
+                        <TableCell>{drink.alcoholGrams.toFixed(1)}g</TableCell>
+                        <TableCell className="px-1">
                           <Button
                             variant="destructive"
                             size="sm"
