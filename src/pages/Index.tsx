@@ -1,25 +1,33 @@
-
 import { useState } from "react";
-import DrinkForm, { Drink } from "@/components/DrinkForm";
+import { Drink } from "@/components/DrinkForm";
 import DailySummary from "@/components/DailySummary";
 import DrinkHistory from "@/components/DrinkHistory";
 import DrinkCalendar from "@/components/DrinkCalendar";
 
 const Index = () => {
-  const [drinks, setDrinks] = useState<Drink[]>([]);
+  const [drinks, setDrinks] = useState<Drink[]>(() => {
+    const savedDrinks = localStorage.getItem('drinks');
+    return savedDrinks ? JSON.parse(savedDrinks) : [];
+  });
+
+  const saveDrinksToLocalStorage = (updatedDrinks: Drink[]) => {
+    localStorage.setItem('drinks', JSON.stringify(updatedDrinks));
+  };
 
   const handleAddDrink = (drink: Drink) => {
-    setDrinks((prev) => [...prev, drink]);
+    setDrinks((prev) => {
+      const newDrinks = [...prev, drink];
+      saveDrinksToLocalStorage(newDrinks);
+      return newDrinks;
+    });
   };
 
   const handleDeleteDrink = (drinkToDelete: Drink) => {
-    setDrinks((prev) => prev.filter(drink => drink !== drinkToDelete));
-  };
-
-  const handleEditDrink = (drinkToEdit: Drink) => {
-    setDrinks((prev) => prev.map(drink => 
-      drink === drinkToEdit ? drinkToEdit : drink
-    ));
+    setDrinks((prev) => {
+      const newDrinks = prev.filter(drink => drink !== drinkToDelete);
+      saveDrinksToLocalStorage(newDrinks);
+      return newDrinks;
+    });
   };
 
   return (
@@ -33,7 +41,6 @@ const Index = () => {
         drinks={drinks} 
         onDeleteDrink={handleDeleteDrink}
         onAddDrink={handleAddDrink}
-        onEditDrink={handleEditDrink}
       />
       <DailySummary drinks={drinks} />
       <DrinkHistory drinks={drinks} />

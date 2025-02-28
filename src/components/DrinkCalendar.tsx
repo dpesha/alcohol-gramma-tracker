@@ -1,35 +1,28 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { format, isToday } from "date-fns";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import DrinkForm, { Drink } from "./DrinkForm";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2 } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash } from "lucide-react";
-import { DayContent } from "react-day-picker";
+
 
 interface DrinkCalendarProps {
   drinks: Drink[];
   onDeleteDrink: (drink: Drink) => void;
   onAddDrink: (drink: Drink) => void;
-  onEditDrink: (drink: Drink) => void;
 }
 
-const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink, onEditDrink }: DrinkCalendarProps) => {
+const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Filter drinks for selected date using start of day comparison
   const selectedDrinks = drinks.filter(drink => 
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
   
-  // Create dots for dates with drinks
   const datesWithDrinks = drinks.reduce((acc: { [key: string]: number }, drink) => {
     const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
     acc[dateStr] = (acc[dateStr] || 0) + drink.alcoholGrams;
