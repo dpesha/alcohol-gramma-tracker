@@ -83,7 +83,7 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
           >
             <LineChart 
               data={dailyData}
-              margin={{ top: 10, right: 25, left: -15, bottom: 20 }}
+              margin={{ top: 10, right: 35, left: -10, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
               <XAxis
