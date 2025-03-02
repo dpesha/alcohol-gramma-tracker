@@ -84,8 +84,8 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
       borderRadius: '50%',
     },
     moderateConsumption: {
-      color: 'black', // Changed to black for better contrast with yellow
-      backgroundColor: '#FEF7CD', // Light yellow for moderate consumption
+      color: 'black', // Dark text for contrast with yellow
+      backgroundColor: '#FFFF00', // Bright yellow for moderate consumption
       borderRadius: '50%',
     },
     highConsumption: {
@@ -135,7 +135,7 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
                         : datesWithDrinks[dateStr].isHighConsumption
                           ? 'text-red-600'
                           : datesWithDrinks[dateStr].isModerateConsumption
-                            ? 'text-yellow-700' // Changed to yellow-700 to match the yellow background
+                            ? 'text-black' // Changed to black for better contrast with yellow
                             : 'text-green-700'
                     }`}>
                       {datesWithDrinks[dateStr].grams.toFixed(1)}g
