@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,8 +16,9 @@ interface DrinkCalendarProps {
   onAddDrink: (drink: Drink) => void;
 }
 
-// Daily alcohol limit in grams
-const DAILY_ALCOHOL_LIMIT = 40;
+// Daily alcohol thresholds in grams
+const MODERATE_ALCOHOL_THRESHOLD = 20;
+const HIGH_ALCOHOL_THRESHOLD = 40;
 
 const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -26,14 +28,15 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
   
-  const datesWithDrinks = drinks.reduce((acc: { [key: string]: { grams: number, isNoDrinkDay: boolean, isOverLimit: boolean } }, drink) => {
+  const datesWithDrinks = drinks.reduce((acc: { [key: string]: { grams: number, isNoDrinkDay: boolean, isModerateConsumption: boolean, isHighConsumption: boolean } }, drink) => {
     const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
     
     if (!acc[dateStr]) {
       acc[dateStr] = {
         grams: 0,
         isNoDrinkDay: false,
-        isOverLimit: false
+        isModerateConsumption: false,
+        isHighConsumption: false
       };
     }
     
@@ -43,8 +46,9 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
       acc[dateStr].grams += drink.alcoholGrams;
     }
     
-    // Check if total grams exceeds the daily limit
-    acc[dateStr].isOverLimit = acc[dateStr].grams > DAILY_ALCOHOL_LIMIT;
+    // Check consumption thresholds
+    acc[dateStr].isModerateConsumption = acc[dateStr].grams > MODERATE_ALCOHOL_THRESHOLD && acc[dateStr].grams <= HIGH_ALCOHOL_THRESHOLD;
+    acc[dateStr].isHighConsumption = acc[dateStr].grams > HIGH_ALCOHOL_THRESHOLD;
     
     return acc;
   }, {});
@@ -58,9 +62,13 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
       const dateStr = format(date, 'yyyy-MM-dd');
       return datesWithDrinks[dateStr]?.isNoDrinkDay;
     },
-    overLimit: (date: Date) => {
+    moderateConsumption: (date: Date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
-      return datesWithDrinks[dateStr]?.isOverLimit;
+      return datesWithDrinks[dateStr]?.isModerateConsumption;
+    },
+    highConsumption: (date: Date) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      return datesWithDrinks[dateStr]?.isHighConsumption;
     }
   };
 
@@ -75,9 +83,14 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
       backgroundColor: 'rgb(255 182 193)',
       borderRadius: '50%',
     },
-    overLimit: {
+    moderateConsumption: {
       color: 'white',
-      backgroundColor: '#ea384c',
+      backgroundColor: '#FFDEE2', // Light red for moderate consumption
+      borderRadius: '50%',
+    },
+    highConsumption: {
+      color: 'white',
+      backgroundColor: '#ea384c', // Red for high consumption
       borderRadius: '50%',
     }
   };
@@ -119,9 +132,11 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
                     <span className={`absolute -bottom-3 text-[0.6rem] font-medium ${
                       datesWithDrinks[dateStr].isNoDrinkDay 
                         ? 'text-pink-600' 
-                        : datesWithDrinks[dateStr].isOverLimit
+                        : datesWithDrinks[dateStr].isHighConsumption
                           ? 'text-red-600'
-                          : 'text-green-700'
+                          : datesWithDrinks[dateStr].isModerateConsumption
+                            ? 'text-pink-500'
+                            : 'text-green-700'
                     }`}>
                       {datesWithDrinks[dateStr].grams.toFixed(1)}g
                     </span>
