@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,6 +16,9 @@ interface DrinkCalendarProps {
   onAddDrink: (drink: Drink) => void;
 }
 
+// Daily alcohol limit in grams
+const DAILY_ALCOHOL_LIMIT = 20;
+
 const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -23,12 +27,26 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     format(new Date(drink.date), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
   
-  const datesWithDrinks = drinks.reduce((acc: { [key: string]: { grams: number, isNoDrinkDay: boolean } }, drink) => {
+  const datesWithDrinks = drinks.reduce((acc: { [key: string]: { grams: number, isNoDrinkDay: boolean, isOverLimit: boolean } }, drink) => {
     const dateStr = format(new Date(drink.date), 'yyyy-MM-dd');
-    acc[dateStr] = {
-      grams: drink.type === "no drink day" ? 0 : (acc[dateStr]?.grams || 0) + drink.alcoholGrams,
-      isNoDrinkDay: drink.type === "no drink day"
-    };
+    
+    if (!acc[dateStr]) {
+      acc[dateStr] = {
+        grams: 0,
+        isNoDrinkDay: false,
+        isOverLimit: false
+      };
+    }
+    
+    if (drink.type === "no drink day") {
+      acc[dateStr].isNoDrinkDay = true;
+    } else {
+      acc[dateStr].grams += drink.alcoholGrams;
+    }
+    
+    // Check if total grams exceeds the daily limit
+    acc[dateStr].isOverLimit = acc[dateStr].grams > DAILY_ALCOHOL_LIMIT;
+    
     return acc;
   }, {});
 
@@ -40,6 +58,10 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     noDrinkDay: (date: Date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       return datesWithDrinks[dateStr]?.isNoDrinkDay;
+    },
+    overLimit: (date: Date) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      return datesWithDrinks[dateStr]?.isOverLimit;
     }
   };
 
@@ -52,6 +74,11 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
     noDrinkDay: {
       color: 'white',
       backgroundColor: 'rgb(255 182 193)',
+      borderRadius: '50%',
+    },
+    overLimit: {
+      color: 'white',
+      backgroundColor: '#ea384c',
       borderRadius: '50%',
     }
   };
@@ -93,7 +120,9 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
                     <span className={`absolute -bottom-3 text-[0.6rem] font-medium ${
                       datesWithDrinks[dateStr].isNoDrinkDay 
                         ? 'text-pink-600' 
-                        : 'text-green-700'
+                        : datesWithDrinks[dateStr].isOverLimit
+                          ? 'text-red-600'
+                          : 'text-green-700'
                     }`}>
                       {datesWithDrinks[dateStr].grams.toFixed(1)}g
                     </span>
