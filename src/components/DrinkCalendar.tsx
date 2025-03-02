@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,7 +16,7 @@ interface DrinkCalendarProps {
 }
 
 // Daily alcohol limit in grams
-const DAILY_ALCOHOL_LIMIT = 20;
+const DAILY_ALCOHOL_LIMIT = 40;
 
 const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
