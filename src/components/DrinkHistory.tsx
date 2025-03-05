@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addMonths, subMonths, isSameMonth } from "date-fns";
+import { format, addMonths, subMonths, isSameMonth, getDaysInMonth } from "date-fns";
 import type { Drink } from "./DrinkForm";
 
 interface DrinkHistoryProps {
@@ -35,6 +36,11 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
 
   // Sort data by date
   dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Calculate monthly average (total alcohol / days in month)
+  const totalAlcohol = dailyData.reduce((sum, day) => sum + day.total, 0);
+  const daysInMonth = getDaysInMonth(currentMonth);
+  const dailyAverage = totalAlcohol / daysInMonth;
 
   const handlePreviousMonth = () => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -79,6 +85,12 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
                   dark: "hsl(var(--primary))",
                 },
               },
+              average: {
+                theme: {
+                  light: "#F97316", // Bright orange
+                  dark: "#F97316",
+                },
+              },
             }}
           >
             <LineChart 
@@ -111,6 +123,24 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
               <Tooltip 
                 labelFormatter={(label) => format(new Date(label), 'PPP')}
                 formatter={(value: number) => [`${value.toFixed(1)}g`, 'Alcohol']}
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-background border border-border/50 rounded-lg p-2 shadow-xl text-xs">
+                        <p className="font-medium">{format(new Date(label), 'PPP')}</p>
+                        <p className="text-foreground">
+                          <span>Alcohol: </span>
+                          <span className="font-mono font-medium">{payload[0].value?.toFixed(1)}g</span>
+                        </p>
+                        <p className="text-orange-500">
+                          <span>Daily average: </span>
+                          <span className="font-mono font-medium">{dailyAverage.toFixed(1)}g</span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
               <Line
                 type="monotone"
@@ -118,6 +148,17 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
                 strokeWidth={2}
                 dot={true}
                 activeDot={{ r: 6 }}
+              />
+              <ReferenceLine 
+                y={dailyAverage} 
+                stroke="#F97316" 
+                strokeDasharray="3 3"
+                label={{ 
+                  value: `Avg: ${dailyAverage.toFixed(1)}g`,
+                  position: 'right',
+                  fill: '#F97316',
+                  fontSize: 9,
+                }}
               />
             </LineChart>
           </ChartContainer>
