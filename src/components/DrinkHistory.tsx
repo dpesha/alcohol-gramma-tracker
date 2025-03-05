@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
@@ -37,27 +36,23 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
   // Sort data by date
   dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Calculate the number of days elapsed in the current month
+  // Calculate the number of days for the average calculation
   const today = new Date();
   const isCurrentMonth = isSameMonth(today, currentMonth);
   
-  // If viewing current month, use days elapsed so far, otherwise use the last date with data
+  // If viewing current month, use days elapsed so far, otherwise use total days in month
   let daysToCount;
   if (isCurrentMonth) {
     daysToCount = getDate(today);
-  } else if (dailyData.length > 0) {
-    // If viewing a past month, use the number of days with data
-    const datesWithData = new Set(dailyData.map(item => format(new Date(item.date), 'd')));
-    daysToCount = datesWithData.size;
   } else {
-    // If no data, use full month
+    // For past months, use the total number of days in the month
     daysToCount = getDaysInMonth(currentMonth);
   }
   
   // Ensure we don't divide by zero
   daysToCount = Math.max(1, daysToCount);
 
-  // Calculate monthly average (total alcohol / days so far in current month)
+  // Calculate monthly average
   const totalAlcohol = dailyData.reduce((sum, day) => sum + day.total, 0);
   const dailyAverage = totalAlcohol / daysToCount;
 
