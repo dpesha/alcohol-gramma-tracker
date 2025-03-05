@@ -5,7 +5,7 @@ import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from "recharts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addMonths, subMonths, isSameMonth, getDaysInMonth } from "date-fns";
+import { format, addMonths, subMonths, isSameMonth, getDaysInMonth, isAfter, startOfMonth, getDate } from "date-fns";
 import type { Drink } from "./DrinkForm";
 
 interface DrinkHistoryProps {
@@ -37,10 +37,29 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
   // Sort data by date
   dailyData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Calculate monthly average (total alcohol / days in month)
+  // Calculate the number of days elapsed in the current month
+  const today = new Date();
+  const isCurrentMonth = isSameMonth(today, currentMonth);
+  
+  // If viewing current month, use days elapsed so far, otherwise use the last date with data
+  let daysToCount;
+  if (isCurrentMonth) {
+    daysToCount = getDate(today);
+  } else if (dailyData.length > 0) {
+    // If viewing a past month, use the number of days with data
+    const datesWithData = new Set(dailyData.map(item => format(new Date(item.date), 'd')));
+    daysToCount = datesWithData.size;
+  } else {
+    // If no data, use full month
+    daysToCount = getDaysInMonth(currentMonth);
+  }
+  
+  // Ensure we don't divide by zero
+  daysToCount = Math.max(1, daysToCount);
+
+  // Calculate monthly average (total alcohol / days so far in current month)
   const totalAlcohol = dailyData.reduce((sum, day) => sum + day.total, 0);
-  const daysInMonth = getDaysInMonth(currentMonth);
-  const dailyAverage = totalAlcohol / daysInMonth;
+  const dailyAverage = totalAlcohol / daysToCount;
 
   const handlePreviousMonth = () => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -154,7 +173,7 @@ const DrinkHistory = ({ drinks }: DrinkHistoryProps) => {
                 stroke="#F97316" 
                 strokeDasharray="3 3"
                 label={{ 
-                  value: `Avg: ${dailyAverage.toFixed(1)}g`,
+                  value: `Avg: ${dailyAverage.toFixed(1)}g (${daysToCount} days)`,
                   position: 'right',
                   fill: '#F97316',
                   fontSize: 9,
