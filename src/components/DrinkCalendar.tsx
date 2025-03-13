@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -44,7 +43,6 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
       acc[dateStr].grams += drink.alcoholGrams;
     }
     
-    // Check if total grams exceeds the daily limit
     acc[dateStr].isOverLimit = acc[dateStr].grams > DAILY_ALCOHOL_LIMIT;
     
     return acc;
@@ -142,10 +140,10 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
             month: "w-full",
             table: "w-full",
             head_row: "w-full flex justify-between",
-            row: "w-full flex justify-between mb-4", // Added mb-4 for more vertical spacing between rows
-            day: "w-8 h-10 md:w-10 md:h-12 p-0", // Increased height from h-8 to h-10/h-12
+            row: "w-full flex justify-between mb-4",
+            day: "w-8 h-8 md:w-10 md:h-10 p-0 flex items-center justify-center",
             head_cell: "w-8 md:w-10 text-center",
-            cell: "w-8 md:w-10 text-center p-0",
+            cell: "w-8 md:w-10 text-center p-0 mb-4",
           }}
         />
       </div>
