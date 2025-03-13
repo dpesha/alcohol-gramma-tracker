@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -113,9 +114,9 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
               const dateStr = format(date, 'yyyy-MM-dd');
               if (dateStr in datesWithDrinks) {
                 return (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <span>{date.getDate()}</span>
-                    <span className={`absolute -bottom-1 text-[0.6rem] font-medium ${
+                  <div className="relative w-full h-full flex flex-col items-center">
+                    <span className="mt-1">{date.getDate()}</span>
+                    <span className={`absolute -bottom-4 text-[0.6rem] font-medium ${
                       datesWithDrinks[dateStr].isNoDrinkDay 
                         ? 'text-pink-600' 
                         : datesWithDrinks[dateStr].isOverLimit
