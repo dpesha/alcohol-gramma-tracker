@@ -67,17 +67,17 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
   const modifiersStyles = {
     hasDrink: {
       color: 'white',
-      backgroundColor: 'hsl(var(--primary))',
+      backgroundColor: '#EF9651',
       borderRadius: '50%',
     },
     noDrinkDay: {
       color: 'white',
-      backgroundColor: 'rgb(255 182 193)',
+      backgroundColor: 'hsl(var(--primary))',
       borderRadius: '50%',
     },
     overLimit: {
       color: 'white',
-      backgroundColor: '#ea384c',
+      backgroundColor: '#EC5228',
       borderRadius: '50%',
     }
   };
@@ -118,10 +118,10 @@ const DrinkCalendar = ({ drinks, onDeleteDrink, onAddDrink}: DrinkCalendarProps)
                     <span className="mt-1">{date.getDate()}</span>
                     <span className={`absolute -bottom-4 text-[0.6rem] font-medium ${
                       datesWithDrinks[dateStr].isNoDrinkDay 
-                        ? 'text-pink-600' 
+                        ? 'text-green-700' 
                         : datesWithDrinks[dateStr].isOverLimit
                           ? 'text-red-600'
-                          : 'text-green-700'
+                          : 'text-yellow-600'
                     }`}>
                       {datesWithDrinks[dateStr].grams.toFixed(1)}g
                     </span>
