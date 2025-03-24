@@ -3,10 +3,6 @@
 
 A web application to help users track their daily alcohol consumption and promote responsible drinking habits.
 
-## Project URL
-
-**URL**: https://lovable.dev/projects/c823787e-d2f0-489d-89fa-d12f1778189d
-
 ## Project Requirements
 
 ### Overview
