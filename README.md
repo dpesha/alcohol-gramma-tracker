@@ -13,7 +13,7 @@ The Responsible Drinking App is designed to help users track and monitor their a
 #### 1. Drink Calendar
 - **Interactive Calendar**: Visual representation of drinking patterns over time
 - **Color-Coded Days**: 
-  - Blue: No-drink days
+  - Green: No-drink days
   - Orange: Days with moderate drinking
   - Red: Days exceeding the recommended limit (40g of alcohol)
 - **Daily Consumption Display**: Shows total alcohol consumption in grams for each day
